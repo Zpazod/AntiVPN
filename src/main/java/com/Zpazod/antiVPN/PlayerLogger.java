@@ -8,8 +8,8 @@ public class PlayerLogger {
         this.plugin = plugin;
     }
 
-    public void logPlayerInfo(String playerName, String playerIP, String lastConnection, boolean isUsingVPN) {
+    public void logPlayerInfo(String playerName, String playerIP, String connectionDate, boolean isUsingVPN) {
         String status = isUsingVPN ? "UTILISE VPN" : "PAS DE VPN";
-        plugin.getLogger().info("Pseudo: " + playerName + ", IP: " + playerIP + ", Dernière Connexion: " + lastConnection + ", Statut VPN: " + status);
+        plugin.getLogger().info("Pseudo: " + playerName + ", IP: " + playerIP + ", Date de Connexion: " + connectionDate + ", Statut VPN: " + status);
     }
 }

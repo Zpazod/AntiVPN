@@ -1,4 +1,0 @@
-name: AntiVPN
-version: '1.0-SNAPSHOT'
-main: com.Zpazod.antiVPN.AntiVPN
-api-version: '1.20'

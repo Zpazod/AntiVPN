@@ -1,0 +1,11 @@
+name: AntiVPN
+version: '1.0-SNAPSHOT'
+main: com.Zpazod.antiVPN.AntiVPN
+api-version: '1.20'
+
+commands:
+  checkvpn:
+    description: Vérifie si un joueur utilise un VPN.
+    usage: /checkvpn <pseudo>
+    permission: antivpn.check
+    permission-message: Vous n'avez pas la permission d'utiliser cette commande.
