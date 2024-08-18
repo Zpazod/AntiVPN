@@ -1,23 +1,33 @@
 package com.Zpazod.antiVPN;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
 
 public class PlayerJoinListener implements Listener {
 
     private final AntiVPN plugin;
-    private final Map<String, PlayerInfo> playerData = new HashMap<>();
+    private final FileManager fileManager;
+    private YamlConfiguration playerData;
 
     public PlayerJoinListener(AntiVPN plugin) {
         this.plugin = plugin;
+        this.fileManager = new FileManager(plugin);
+        loadPlayerData();
+    }
+
+    private void loadPlayerData() {
+        File playerDataFile = fileManager.getPlayerDataFile();
+        if (playerDataFile.exists()) {
+            playerData = YamlConfiguration.loadConfiguration(playerDataFile);
+        } else {
+            playerData = new YamlConfiguration();
+        }
     }
 
     @EventHandler
@@ -29,42 +39,32 @@ public class PlayerJoinListener implements Listener {
         VPNChecker vpnChecker = new VPNChecker(plugin);
         boolean isUsingVPN = vpnChecker.isUsingVPN(playerIP);
 
-        // Enregistre les informations du joueur dans le HashMap
-        playerData.put(playerName, new PlayerInfo(playerName, playerIP, connectionDate, isUsingVPN));
-
-        // Sauvegarde les données dans le fichier YAML
+        // Enregistre les informations du joueur dans le fichier YAML
+        playerData.set("players." + playerName + ".name", playerName);
+        playerData.set("players." + playerName + ".ip", playerIP);
+        playerData.set("players." + playerName + ".lastConnection", connectionDate);
+        playerData.set("players." + playerName + ".usingVPN", isUsingVPN);
         savePlayerData();
 
         plugin.getLogger().info("Pseudo: " + playerName + ", IP: " + playerIP + ", Date de Connexion: " + connectionDate + ", Statut VPN: " + (isUsingVPN ? "UTILISE VPN" : "PAS DE VPN"));
     }
 
-    public PlayerInfo getPlayerInfo(String playerName) {
-        return playerData.get(playerName);
-    }
-
     public void savePlayerData() {
-        FileConfiguration config = plugin.getConfig();
-        config.set("players", null); // Clear existing data
-
-        for (Map.Entry<String, PlayerInfo> entry : playerData.entrySet()) {
-            String playerName = entry.getKey();
-            PlayerInfo info = entry.getValue();
-            config.set("players." + playerName + ".ip", info.getIp());
-            config.set("players." + playerName + ".lastConnection", info.getLastConnection());
-            config.set("players." + playerName + ".isUsingVPN", info.isUsingVPN());
+        try {
+            playerData.save(fileManager.getPlayerDataFile());
+        } catch (Exception e) {
+            plugin.getLogger().severe("Erreur lors de la sauvegarde des données des joueurs : " + e.getMessage());
         }
-        plugin.saveConfig();
     }
 
-    public void loadPlayerData() {
-        FileConfiguration config = plugin.getConfig();
-        if (config.contains("players")) {
-            for (String playerName : config.getConfigurationSection("players").getKeys(false)) {
-                String ip = config.getString("players." + playerName + ".ip");
-                String lastConnection = config.getString("players." + playerName + ".lastConnection");
-                boolean isUsingVPN = config.getBoolean("players." + playerName + ".isUsingVPN");
-                playerData.put(playerName, new PlayerInfo(playerName, ip, lastConnection, isUsingVPN));
-            }
+    public PlayerInfo getPlayerInfo(String playerName) {
+        if (playerData.contains("players." + playerName)) {
+            String name = playerData.getString("players." + playerName + ".name");
+            String ip = playerData.getString("players." + playerName + ".ip");
+            String lastConnection = playerData.getString("players." + playerName + ".lastConnection");
+            boolean usingVPN = playerData.getBoolean("players." + playerName + ".usingVPN");
+            return new PlayerInfo(name, ip, lastConnection, usingVPN);
         }
+        return null;
     }
 }

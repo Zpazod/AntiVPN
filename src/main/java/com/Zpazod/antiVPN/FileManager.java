@@ -13,6 +13,7 @@ public class FileManager {
     }
 
     public void createPlayerDataFile() {
+        // Crée le répertoire AntiVPNConfig dans le répertoire de données du plugin
         File dataFolder = new File(plugin.getDataFolder(), "AntiVPNConfig");
         if (!dataFolder.exists()) {
             if (dataFolder.mkdirs()) {
@@ -22,11 +23,15 @@ public class FileManager {
             }
         }
 
+        // Crée le fichier playerdata.yml dans le répertoire AntiVPNConfig
         File playerDataFile = new File(dataFolder, "playerdata.yml");
         if (!playerDataFile.exists()) {
-            // Copie le fichier playerdata.yml depuis les ressources du JAR
-            plugin.saveResource("AntiVPNConfig/playerdata.yml", false);
+            plugin.saveResource("playerdata.yml", false); // Copie le fichier par défaut dans le répertoire
             plugin.getLogger().info("Fichier playerdata.yml créé.");
         }
+    }
+
+    public File getPlayerDataFile() {
+        return new File(plugin.getDataFolder(), "AntiVPNConfig/playerdata.yml");
     }
 }

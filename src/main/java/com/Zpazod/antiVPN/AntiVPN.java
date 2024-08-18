@@ -14,19 +14,15 @@ public class AntiVPN extends JavaPlugin {
         fileManager.createPlayerDataFile();
         playerJoinListener = new PlayerJoinListener(this);
         Bukkit.getPluginManager().registerEvents(playerJoinListener, this);
-        getCommand("checkvpn").setExecutor(new CheckVPNCommand(this, playerJoinListener));
-        playerJoinListener.loadPlayerData();
+        this.getCommand("checkvpn").setExecutor(new CheckVPNCommand(this, playerJoinListener));
         getLogger().info("AntiVPN activé !");
     }
 
     @Override
     public void onDisable() {
         if (playerJoinListener != null) {
-            playerJoinListener.savePlayerData();
-        } else {
-            getLogger().warning("Le PlayerJoinListener est null. Les données des joueurs ne peuvent pas être sauvegardées.");
+            playerJoinListener.savePlayerData(); // Sauvegarde des données des joueurs
         }
-
         getLogger().info("AntiVPN désactivé !");
     }
 }
