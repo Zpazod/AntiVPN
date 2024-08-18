@@ -1,5 +1,6 @@
 package com.Zpazod.antiVPN;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,21 +17,33 @@ public class CheckVPNCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        // Vérifie que la commande est bien utilisée avec un seul argument
         if (args.length != 1) {
-            sender.sendMessage("Usage: /checkvpn <pseudo>");
+            sender.sendMessage(ChatColor.RED + "Usage: /checkvpn <pseudo>");
             return false;
         }
 
         String playerName = args[0];
         PlayerInfo playerInfo = playerJoinListener.getPlayerInfo(playerName);
 
+        // Vérifie si des données sont disponibles pour le joueur
         if (playerInfo == null) {
-            sender.sendMessage("Aucune donnée disponible pour le joueur " + playerName + ".");
+            sender.sendMessage(ChatColor.RED + "Aucune donnée disponible pour le joueur " + playerName + ".");
             return true;
         }
 
-        String status = playerInfo.isUsingVPN() ? "UTILISE VPN" : "PAS DE VPN";
-        sender.sendMessage("Pseudo: " + playerInfo.getPlayerName() + ", IP: " + playerInfo.getIp() + ", Dernière Connexion: " + playerInfo.getLastConnection() + ", Statut VPN: " + status);
+        // Prépare les messages avec les couleurs pour l'affichage en jeu
+        String status = playerInfo.isUsingVPN() ? ChatColor.RED + "UTILISE VPN" : ChatColor.GREEN + "PAS DE VPN";
+        String playerNameMessage = ChatColor.YELLOW + "Pseudo: " + ChatColor.WHITE + playerInfo.getPlayerName();
+        String playerIPMessage = ChatColor.YELLOW + "IP: " + ChatColor.WHITE + playerInfo.getIp();
+        String connectionDateMessage = ChatColor.YELLOW + "Dernière Connexion: " + ChatColor.WHITE + playerInfo.getLastConnection();
+        String statusMessage = ChatColor.YELLOW + "Statut VPN: " + status;
+
+        // Envoie les messages au CommandSender
+        sender.sendMessage(playerNameMessage);
+        sender.sendMessage(playerIPMessage);
+        sender.sendMessage(connectionDateMessage);
+        sender.sendMessage(statusMessage);
 
         return true;
     }
